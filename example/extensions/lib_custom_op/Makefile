@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,11 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# build and install are separated so changes to build don't invalidate
-# the whole docker cache for the image
+all: subgraph_lib gemm_lib
 
-set -ex
+gemm_lib:
+	g++ -shared -fPIC -std=c++11 gemm_lib.cc -o libgemm_lib.so -I ../../../include/mxnet
 
-# fix nvidia docker image come with wrong version of libcublas
-yum -y downgrade libcublas-devel-10.2.1.243-1.x86_64
-yum -y downgrade libcublas10-10.2.1.243-1.x86_64
+subgraph_lib:
+	g++ -shared -fPIC -std=c++11 subgraph_lib.cc -o libsubgraph_lib.so -I ../../../include/mxnet
+
+clean:
+	rm -rf libsubgraph_lib.so libgemm_lib.so

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,15 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# coding: utf-8
-# pylint: disable=arguments-differ
+include(FindPackageHandleStandardArgs)
 
-# This test checks if dynamic loading of library into MXNet is successful
+set(CUDNN_ROOT "/usr/local/cuda/include" CACHE PATH "cuDNN root folder")
 
-import mxnet as mx
-import os
+find_path(CUDNN_INCLUDE cudnn.h
+  PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT}
+  DOC "Path to cuDNN include directory." )
 
-if (os.name=='posix'):
-    mx.library.load('mylib.so')
-elif (os.name=='nt'):
-    mx.library.load('mylib.dll')
+find_library(CUDNN_LIBRARY NAMES libcudnn.so cudnn.lib # libcudnn_static.a
+  PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDNN_INCLUDE}
+  PATH_SUFFIXES lib lib/x64  cuda/lib cuda/lib64 lib/x64
+  DOC "Path to cuDNN library.")
+
+find_package_handle_standard_args(CUDNN DEFAULT_MSG CUDNN_LIBRARY CUDNN_INCLUDE)
+
+mark_as_advanced(CUDNN_ROOT CUDNN_INCLUDE CUDNN_LIBRARY)
